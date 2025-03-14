@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code with Text Info</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .form-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #qrcode {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .download-btn {
+            background-color: #007bff;
+            margin-top: 10px;
+        }
+        .download-btn:hover {
+            background-color: #0069d9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text QR Code Generator</h1>
+        
+        <div class="form-group">
+            <label for="qrTitle">QR Title (optional):</label>
+            <input type="text" id="qrTitle" placeholder="Enter a title for your QR code">
+        </div>
+        
+        <div class="form-group">
+            <label for="qrText">Text to include in QR code:</label>
+            <textarea id="qrText" placeholder="Enter the text you want to display when someone scans this QR code"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="qrSize">QR Code Size (px):</label>
+            <input type="number" id="qrSize" value="200" min="100" max="400">
+        </div>
+        
+        <button onclick="generateQR()">Generate QR Code</button>
+        
+        <div id="qrcode"></div>
+        <button id="downloadBtn" class="download-btn" style="display: none;">Download QR Code</button>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Enter the text you want to display when someone scans your QR code</li>
+                <li>Click "Generate QR Code"</li>
+                <li>Download the generated QR code image</li>
+                <li>When someone scans this QR code, it will display your text instead of redirecting to a website</li>
+                <li>To deploy on GitHub Pages:
+                    <ul>
+                        <li>Create a new GitHub repository</li>
+                        <li>Add this HTML file as index.html</li>
+                        <li>Go to repository Settings > Pages</li>
+                        <li>Enable GitHub Pages from the main branch</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function generateQR() {
+            const text = document.getElementById("qrText").value;
+            const title = document.getElementById("qrTitle").value;
+            const size = document.getElementById("qrSize").value;
+            const qrcodeDiv = document.getElementById("qrcode");
+            const downloadBtn = document.getElementById("downloadBtn");
+            
+            // Clear previous QR code
+            qrcodeDiv.innerHTML = "";
+            
+            if (text) {
+                // Create QR code with text content
+                const fullContent = title ? `${title}\n\n${text}` : text;
+                
+                // Generate QR code
+                const qrcode = new QRCode(qrcodeDiv, {
+                    text: fullContent,
+                    width: parseInt(size),
+                    height: parseInt(size),
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Show download button after QR code is generated
+                setTimeout(() => {
+                    downloadBtn.style.display = "block";
+                    downloadBtn.addEventListener("click", function() {
+                        // Get the image from the QR code div
+                        const img = qrcodeDiv.querySelector("img");
+                        if (img) {
+                            // Create a temporary link to download the image
+                            const link = document.createElement("a");
+                            link.href = img.src;
+                            link.download = "qr-code.png";
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                    });
+                }, 200);
+            } else {
+                qrcodeDiv.innerHTML = "<p>Please enter some text to generate a QR code.</p>";
+                downloadBtn.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
